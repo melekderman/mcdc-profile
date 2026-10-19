@@ -1,12 +1,8 @@
 import numpy as np
 import mcdc
-import sys
 
-method = sys.argv[1]
-if method not in ["analog"]:
-    print("[ERROR] Unsupported method: %s" % method)
-    exit()
-
+# Create MC/DC simulation
+simulation = mcdc.Simulation("AZURV1 census tally")
 
 # ======================================================================================
 # Set model
@@ -16,7 +12,7 @@ if method not in ["analog"]:
 # Effective scattering ratio c = 1.1
 
 # Set materials
-m = mcdc.MaterialMG(
+m = mcdc.Material.multigroup(
     capture=np.array([1.0 / 3.0]),
     scatter=np.array([[1.0 / 3.0]]),
     fission=np.array([1.0 / 3.0]),
@@ -28,31 +24,40 @@ s1 = mcdc.Surface.PlaneX(x=-1e10, boundary_condition="reflective")
 s2 = mcdc.Surface.PlaneX(x=1e10, boundary_condition="reflective")
 
 # Set cells
-mcdc.Cell(region=+s1 & -s2, fill=m)
+cell = mcdc.Cell(region=+s1 & -s2, fill=m)
+simulation.set_model([cell])
 
 # ======================================================================================
 # Set source
 # ======================================================================================
 # Isotropic pulse at x=t=0
 
-mcdc.Source(
+source = mcdc.Source(
     position=[0.0, 0.0, 0.0],
     isotropic=True,
-    energy_group=0,
+    energy=0,
     time=0.0,
 )
+simulation.set_sources([source])
 
 # ======================================================================================
-# Set tallies, settings, and run MC/DC
+# Set tallies, settings, techniques, and run MC/DC
 # ======================================================================================
 
 # Tallies
 mesh = mcdc.MeshStructured(x=np.linspace(-20.5, 20.5, 202))
-mcdc.TallyMesh(mesh=mesh, scores=["flux"], time=np.linspace(0.0, 20.0, 21))
+tally = mcdc.Tally(mesh=mesh, scores=["flux"], time=np.linspace(0.0, 20.0, 21))
+simulation.set_tallies([tally])
 
 # Settings
-mcdc.settings.N_particle = 100000
-mcdc.settings.N_batch = 30
+simulation.settings.N_particle = 50
+simulation.settings.N_batch = 2
+simulation.settings.census_bank_buffer_ratio = 5.0
+simulation.settings.source_bank_buffer_ratio = 5.0
+simulation.settings.set_time_census(np.linspace(0.0, 20.0, 21)[1:], tally_frequency=5)
+
+# Techniques
+simulation.technique.population_control()
 
 # Run
-mcdc.run()
+simulation.run()

@@ -1,0 +1,78 @@
+# Profiling tasks: <problem> -> <method> -> <mode>: [start, stop, num]
+#
+# Particle counts are generated as np.logspace(start, stop, num, dtype=int),
+# i.e., `num` log-spaced values from 10^start to 10^stop. One profiling run is
+# performed for each value (e.g., [4, 6, 3] -> 1e4, 1e5, 1e6 particles).
+# Use `run.py --N_particle` to override with a single particle count.
+
+# Multigroup (361 groups), infinite medium, fission, time-dependent, census + population control
+inf_shem361_td_census:
+    population_control:
+        python: [4, 6, 3]
+        numba:  [4, 6, 3]
+
+# 3D plane-surface geometry with void and shield, implicit capture, time-dependent cell/mesh/global tallies
+kobayashi3-TD:
+    implicit_capture:
+        python: [4, 6, 3]
+        numba:  [4, 6, 3]
+
+# Multigroup infinite medium (AZURV1), fission, census + population control, census-based tally
+azurv1_census_tally:
+    population_control:
+        python: [4, 6, 3]
+        numba:  [4, 6, 3]
+
+# Continuous-energy neutron physics, cylinder surface, k-eigenvalue mode
+pincell-k_eigenvalue:
+    analog:
+        python: [4, 6, 3]
+        numba:  [4, 6, 3]
+
+# Multigroup C5G7, universes + lattices, k-eigenvalue with gyration radius, population control
+c5g7_2d_k_eigenvalue:
+    population_control:
+        python: [4, 6, 3]
+        numba:  [4, 6, 3]
+
+# Universes with rotation/translation, CylinderX/CylinderZ/Sphere surfaces
+fuel_array_packaged:
+    analog:
+        python: [4, 6, 3]
+        numba:  [4, 6, 3]
+
+# Moving geometry (moving pellet), cylinder surface, time-dependent fission mesh tally
+moving_pellet:
+    analog:
+        python: [4, 6, 3]
+        numba:  [4, 6, 3]
+
+# Continuous-energy neutron physics, weight windows
+basic_weight_windows:
+    weight_windows:
+        python: [4, 6, 3]
+        numba:  [4, 6, 3]
+
+# Multigroup 2D, implicit capture + global weight roulette
+cooper2:
+    weight_roulette:
+        python: [4, 6, 3]
+        numba:  [4, 6, 3]
+
+# Continuous-energy neutron physics, energy deposition tally
+pincell-energy_deposition:
+    analog:
+        python: [4, 6, 3]
+        numba:  [4, 6, 3]
+
+# Electron transport, energy deposition + flux mesh tallies, surface (net current) tally
+lockwood:
+    analog:
+        python: [3, 5, 3]
+        numba:  [4, 6, 3]
+
+# Proton transport, condensed interactions, implicit capture, energy deposition tally
+proton_beam:
+    implicit_capture:
+        python: [3, 5, 3]
+        numba:  [4, 6, 3]
